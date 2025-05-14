@@ -1,17 +1,3 @@
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast, Toaster } from 'sonner';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -22,7 +8,14 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
+import { toast, Toaster } from 'sonner';
+import { Pencil, Trash } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -96,11 +89,11 @@ export default function KategoriPaketIndex({ kategori, status, success, error }:
                     </Button>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Daftar Kategori Paket</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                <div className="rounded-xl border border-slate-200 p-4">
+                    <div>
+                        <h4 className="mb-2 text-lg">Daftar Kategori Paket</h4>
+                    </div>
+                    <div>
                         <div className="overflow-x-auto">
                             <Table>
                                 <TableHeader>
@@ -115,17 +108,13 @@ export default function KategoriPaketIndex({ kategori, status, success, error }:
                                         <TableRow key={item.id}>
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell>{item.nama_kategori}</TableCell>
-                                            <TableCell className="text-right space-x-2">
-                                                <Button variant="secondary" size="sm" asChild>
-                                                    <Link href={route('kategori_paket.edit', item.id)}>
-                                                        Edit
-                                                    </Link>
+                                            <TableCell className="space-x-2 text-right">
+                                                <Button variant="link" size="sm">
+                                                    <Pencil />
+                                                    <Link href={route('kategori_paket.edit', item.id)}>Edit</Link>
                                                 </Button>
-                                                <Button
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    onClick={() => handleDeleteClick(item.id)}
-                                                >
+                                                <Button variant="link" className="text-red-500 cursor-pointer" size="sm" onClick={() => handleDeleteClick(item.id)}>
+                                                    <Trash />
                                                     Hapus
                                                 </Button>
                                             </TableCell>
@@ -134,10 +123,10 @@ export default function KategoriPaketIndex({ kategori, status, success, error }:
                                 </TableBody>
                             </Table>
                         </div>
-                    </CardContent>
-                </Card>
+                    </div>
+                </div>
 
-                {/* Delete Confirmation Dialog */}
+                {/* Modal konfirmasi hapus */}
                 <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
@@ -148,10 +137,7 @@ export default function KategoriPaketIndex({ kategori, status, success, error }:
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel>Batal</AlertDialogCancel>
-                            <AlertDialogAction
-                                onClick={handleDeleteConfirm}
-                                className="bg-destructive text-white hover:bg-destructive/70"
-                            >
+                            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive hover:bg-destructive/70 text-white">
                                 Hapus
                             </AlertDialogAction>
                         </AlertDialogFooter>

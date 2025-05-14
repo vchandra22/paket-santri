@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast, Toaster } from 'sonner';
@@ -75,11 +73,10 @@ export default function KategoriPaketForm({ kategori }: Props) {
                     </h1>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Form Kategori Paket</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                    <div>
+                        <h4 className="text-lg">Form Kategori Paket</h4>
+                    </div>
+                    <div>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 gap-4">
                                 <div className="space-y-2">
@@ -99,7 +96,7 @@ export default function KategoriPaketForm({ kategori }: Props) {
                                 </div>
                             </div>
 
-                            <div className="flex justify-end space-x-2">
+                            <div className="flex justify-start space-x-2">
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -112,8 +109,7 @@ export default function KategoriPaketForm({ kategori }: Props) {
                                 </Button>
                             </div>
                         </form>
-                    </CardContent>
-                </Card>
+                    </div>
             </div>
         </AppLayout>
     );

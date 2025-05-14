@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { toast, Toaster } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -51,7 +49,7 @@ export default function AsramaForm({ asrama }: Props) {
                 },
                 onError: () => {
                     toast.error('Gagal memperbarui data asrama');
-                }
+                },
             });
         } else {
             post(route('asrama.store'), {
@@ -60,78 +58,62 @@ export default function AsramaForm({ asrama }: Props) {
                 },
                 onError: () => {
                     toast.error('Gagal menyimpan data asrama');
-                }
+                },
             });
         }
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={isEditMode ? "Edit Asrama" : "Tambah Asrama"} />
+            <Head title={isEditMode ? 'Edit Asrama' : 'Tambah Asrama'} />
             <Toaster position="top-right" richColors />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">
-                        {isEditMode ? 'Edit Data Asrama' : 'Tambah Data Asrama'}
-                    </h1>
+                    <h1 className="text-2xl font-bold">{isEditMode ? 'Edit Data Asrama' : 'Tambah Data Asrama'}</h1>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Form Asrama</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="grid grid-cols-1 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="nama_asrama">Nama Asrama</Label>
-                                    <Input
-                                        id="nama_asrama"
-                                        value={data.nama_asrama}
-                                        onChange={(e) => setData('nama_asrama', e.target.value)}
-                                        placeholder="Masukkan nama asrama"
-                                        className={errors.nama_asrama ? 'border-red-500' : ''}
-                                    />
-                                    {errors.nama_asrama && (
-                                        <p className="text-sm text-red-500">
-                                            {errors.nama_asrama}
-                                        </p>
-                                    )}
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="gedung">Gedung</Label>
-                                    <Input
-                                        id="gedung"
-                                        value={data.gedung}
-                                        onChange={(e) => setData('gedung', e.target.value)}
-                                        placeholder="Masukkan nama gedung"
-                                        className={errors.gedung ? 'border-red-500' : ''}
-                                    />
-                                    {errors.gedung && (
-                                        <p className="text-sm text-red-500">
-                                            {errors.gedung}
-                                        </p>
-                                    )}
-                                </div>
+                <div>
+                    <h4 className="text-lg">Form Asrama</h4>
+                </div>
+                <div>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="nama_asrama">Nama Asrama</Label>
+                                <Input
+                                    id="nama_asrama"
+                                    value={data.nama_asrama}
+                                    onChange={(e) => setData('nama_asrama', e.target.value)}
+                                    placeholder="Masukkan nama asrama"
+                                    className={errors.nama_asrama ? 'border-red-500' : ''}
+                                />
+                                {errors.nama_asrama && <p className="text-sm text-red-500">{errors.nama_asrama}</p>}
                             </div>
 
-                            <div className="flex justify-end space-x-2">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => window.history.back()}
-                                >
-                                    Batal
-                                </Button>
-                                <Button type="submit" disabled={processing}>
-                                    {processing ? 'Menyimpan...' : isEditMode ? 'Perbarui' : 'Simpan'}
-                                </Button>
+                            <div className="space-y-2">
+                                <Label htmlFor="gedung">Gedung</Label>
+                                <Input
+                                    id="gedung"
+                                    value={data.gedung}
+                                    onChange={(e) => setData('gedung', e.target.value)}
+                                    placeholder="Masukkan nama gedung"
+                                    className={errors.gedung ? 'border-red-500' : ''}
+                                />
+                                {errors.gedung && <p className="text-sm text-red-500">{errors.gedung}</p>}
                             </div>
-                        </form>
-                    </CardContent>
-                </Card>
+                        </div>
+
+                        <div className="flex justify-start space-x-2">
+                            <Button type="button" variant="outline" onClick={() => window.history.back()}>
+                                Batal
+                            </Button>
+                            <Button type="submit" disabled={processing}>
+                                {processing ? 'Menyimpan...' : isEditMode ? 'Perbarui' : 'Simpan'}
+                            </Button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </AppLayout>
     );

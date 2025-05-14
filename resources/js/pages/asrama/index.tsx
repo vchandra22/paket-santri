@@ -10,7 +10,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast, Toaster } from 'sonner';
 import {
     AlertDialog,
@@ -23,6 +22,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
+import { Pen, Pencil, Trash } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -93,11 +93,11 @@ export default function AsramaIndex({ asrama, success, error }: Props) {
                     </Button>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Daftar Asrama</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                <div className="border border-slate-200 rounded-xl p-4">
+                    <div>
+                        <h4 className="text-lg mb-2">Daftar Asrama</h4>
+                    </div>
+                    <div>
                         <div className="overflow-x-auto">
                             <Table>
                                 <TableHeader>
@@ -115,16 +115,19 @@ export default function AsramaIndex({ asrama, success, error }: Props) {
                                             <TableCell>{item.nama_asrama}</TableCell>
                                             <TableCell>{item.gedung}</TableCell>
                                             <TableCell className="text-right space-x-2">
-                                                <Button variant="secondary" size="sm" asChild>
+                                                <Button variant="link" size="sm">
+                                                    <Pencil/>
                                                     <Link href={route('asrama.edit', item.id)}>
                                                         Edit
                                                     </Link>
                                                 </Button>
                                                 <Button
-                                                    variant="destructive"
+                                                    variant="link"
                                                     size="sm"
+                                                    className="text-red-500 cursor-pointer"
                                                     onClick={() => handleDeleteClick(item.id)}
                                                 >
+                                                    <Trash/>
                                                     Hapus
                                                 </Button>
                                             </TableCell>
@@ -133,10 +136,10 @@ export default function AsramaIndex({ asrama, success, error }: Props) {
                                 </TableBody>
                             </Table>
                         </div>
-                    </CardContent>
-                </Card>
+                    </div>
+                </div>
 
-                {/* Delete Confirmation Dialog */}
+                {/* Modal konfirmasi hapus */}
                 <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                     <AlertDialogContent>
                         <AlertDialogHeader>

@@ -34,7 +34,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface Santri {
     id: number;
-    nama: string;
+    nama_santri: string;
     nis: string;
 }
 
@@ -120,11 +120,11 @@ export default function PaketForm({ paket, santri, kategori, asrama }: Props) {
                     </h1>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Form Paket</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+
+                    <div>
+                        <h4 className="text-lg">Form Paket</h4>
+                    </div>
+                    <div>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
@@ -195,7 +195,7 @@ export default function PaketForm({ paket, santri, kategori, asrama }: Props) {
                                         <SelectContent>
                                             {santri.map((item) => (
                                                 <SelectItem key={item.id} value={item.nis}>
-                                                    {item.nama} ({item.nis})
+                                                    {item.nama_santri} <span className="font-semibold">({item.nis})</span>
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
@@ -285,7 +285,7 @@ export default function PaketForm({ paket, santri, kategori, asrama }: Props) {
                                 </div>
                             </div>
 
-                            <div className="flex justify-end space-x-2">
+                            <div className="flex justify-start space-x-2">
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -298,8 +298,7 @@ export default function PaketForm({ paket, santri, kategori, asrama }: Props) {
                                 </Button>
                             </div>
                         </form>
-                    </CardContent>
-                </Card>
+                    </div>
             </div>
         </AppLayout>
     );

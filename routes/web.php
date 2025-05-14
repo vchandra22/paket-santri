@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AsramaController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KategoriPaketController;
 use App\Http\Controllers\PaketController;
 use App\Http\Controllers\SantriController;
@@ -12,9 +13,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // route santri
     Route::prefix('santri')->group(function () {

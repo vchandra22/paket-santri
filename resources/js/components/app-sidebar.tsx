@@ -13,9 +13,9 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Santri',
-        href: '/santri',
-        icon: UsersRound,
+        title: 'Paket',
+        href: '/paket',
+        icon: Package,
     },
     {
         title: 'Kategori Paket',
@@ -23,9 +23,9 @@ const mainNavItems: NavItem[] = [
         icon: Archive,
     },
     {
-        title: 'Paket',
-        href: '/paket',
-        icon: Package,
+        title: 'Santri',
+        href: '/santri',
+        icon: UsersRound,
     },
     {
         title: 'Asrama',
