@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Santri;
+namespace App\Http\Requests\Asrama;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SantriUpdateRequest extends FormRequest
+class AsramaUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +22,8 @@ class SantriUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_santri' => 'required|string|max:100',
-            'alamat' => 'nullable|string|max:100',
-            'asrama_id' => 'required|exists:asrama,id',
-            'total_paket_diterima' => 'nullable|integer|min:0',
+            'nama_asrama' => 'required|string|max:100',
+            'gedung' => 'required|string|max:100',
         ];
     }
 }

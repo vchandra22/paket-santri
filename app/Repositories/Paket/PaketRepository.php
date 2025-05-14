@@ -1,25 +1,27 @@
 <?php
-namespace App\Repositories\Santri;
+namespace App\Repositories\Paket;
 
-use App\Models\Santri;
+use App\Models\Paket;
 use App\Repositories\Interfaces\BaseRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
-class SantriRepository implements BaseRepositoryInterface
+class PaketRepository implements BaseRepositoryInterface
 {
     protected $model;
 
-    public function __construct(Santri $model)
+    public function __construct(Paket $model)
     {
         $this->model = $model;
     }
+
     public function all()
     {
-        return $this->model->with('asrama', 'paket')->get();
+        return $this->model->with('santri', 'kategori', 'asrama')->get();
     }
 
     public function find($id)
     {
-        return $this->model->with('asrama', 'paket')->where('nis', $id)->first();
+        return $this->model->with('santri', 'kategori', 'asrama')->findOrFail($id);
     }
 
     public function create(array $data)
