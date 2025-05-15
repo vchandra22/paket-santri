@@ -112,34 +112,36 @@ export default function AsramaIndex({ asrama, success, error }: Props) {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {asrama.map((item, index) => (
-                                        <TableRow key={item.id}>
-                                            <TableCell>{index + 1}</TableCell>
-                                            <TableCell>{item.nama_asrama}</TableCell>
-                                            <TableCell>{item.gedung}</TableCell>
-                                            <TableCell className="text-right space-x-2">
-                                                <Can permission="asrama_edit">
-                                                    <Button variant="link" size="sm" asChild>
-                                                        <Link href={route('asrama.edit', item.id)}>
-                                                            <Pencil className="mr-1 h-4 w-4" />
-                                                            Edit
-                                                        </Link>
-                                                    </Button>
-                                                </Can>
-                                                <Can permission="asrama_delete">
-                                                    <Button
-                                                        variant="link"
-                                                        size="sm"
-                                                        className="text-red-500"
-                                                        onClick={() => handleDeleteClick(item.id)}
-                                                    >
-                                                        <Trash className="mr-1 h-4 w-4" />
-                                                        Hapus
-                                                    </Button>
-                                                </Can>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+                                    <Can permission="asrama_view">
+                                        {asrama.map((item, index) => (
+                                            <TableRow key={item.id}>
+                                                <TableCell>{index + 1}</TableCell>
+                                                <TableCell>{item.nama_asrama}</TableCell>
+                                                <TableCell>{item.gedung}</TableCell>
+                                                <TableCell className="text-right space-x-2">
+                                                    <Can permission="asrama_edit">
+                                                        <Button variant="link" size="sm" asChild>
+                                                            <Link href={route('asrama.edit', item.id)}>
+                                                                <Pencil className="mr-1 h-4 w-4" />
+                                                                Edit
+                                                            </Link>
+                                                        </Button>
+                                                    </Can>
+                                                    <Can permission="asrama_delete">
+                                                        <Button
+                                                            variant="link"
+                                                            size="sm"
+                                                            className="text-red-500"
+                                                            onClick={() => handleDeleteClick(item.id)}
+                                                        >
+                                                            <Trash className="mr-1 h-4 w-4" />
+                                                            Hapus
+                                                        </Button>
+                                                    </Can>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </Can>
                                 </TableBody>
                             </Table>
                         </div>

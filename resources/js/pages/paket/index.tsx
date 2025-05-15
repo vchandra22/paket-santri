@@ -25,6 +25,7 @@ import {
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Pencil, Trash } from 'lucide-react';
+import Can from '@/components/permission/Can';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -39,7 +40,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface Santri {
     id: number;
-    nama: string;
+    nama_santri: string;
     nis: string;
 }
 
@@ -134,15 +135,19 @@ export default function PaketIndex({ paket, status, success, error }: Props) {
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Data Paket</h1>
                     <div className="flex justify-end gap-4">
-                        <a
-                            href={route('paket.export')}
-                            className="bg-green-700 hover:bg-green-700/90 text-primary-foreground rounded-sm shadow-xs text-sm font-medium h-9 px-4 py-2 has-[>svg]:px-3"
-                        >
-                            Export to Excel
-                        </a>
-                        <Button asChild>
-                            <Link href={route('paket.create')}>Tambah Paket</Link>
-                        </Button>
+                        <Can permission="paket_export">
+                            <a
+                                href={route('paket.export')}
+                                className="bg-green-700 hover:bg-green-700/90 text-primary-foreground rounded-sm shadow-xs text-sm font-medium h-9 px-4 py-2 has-[>svg]:px-3"
+                            >
+                                Export to Excel
+                            </a>
+                        </Can>
+                        <Can permission="paket_create">
+                            <Button asChild>
+                                <Link href={route('paket.create')}>Tambah Paket</Link>
+                            </Button>
+                        </Can>
                     </div>
                 </div>
 
@@ -166,34 +171,40 @@ export default function PaketIndex({ paket, status, success, error }: Props) {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {paket.map((item, index) => (
-                                        <TableRow key={item.id}>
-                                            <TableCell>{index + 1}</TableCell>
-                                            <TableCell>{item.nama_paket}</TableCell>
-                                            <TableCell>{item.santri?.nama_santri || '-'}</TableCell>
-                                            <TableCell>{item.kategori?.nama_kategori || '-'}</TableCell>
-                                            <TableCell>{item.asrama?.nama_asrama || '-'}</TableCell>
-                                            <TableCell>{new Date(item.tanggal_diterima).toLocaleDateString('id-ID')}</TableCell>
-                                            <TableCell>{renderStatus(item.status_paket)}</TableCell>
-                                            <TableCell className="text-right space-x-2">
-                                                <Button variant="link" size="sm">
-                                                    <Pencil/>
-                                                    <Link href={route('paket.edit', item.id)}>
-                                                        Edit
-                                                    </Link>
-                                                </Button>
-                                                <Button
-                                                    variant="link"
-                                                    size="sm"
-                                                    className="text-red-500 cursor-pointer"
-                                                    onClick={() => handleDeleteClick(item.id)}
-                                                >
-                                                    <Trash/>
-                                                    Hapus
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+                                    <Can permission="paket_view">
+                                        {paket.map((item, index) => (
+                                            <TableRow key={item.id}>
+                                                <TableCell>{index + 1}</TableCell>
+                                                <TableCell>{item.nama_paket}</TableCell>
+                                                <TableCell>{item.santri?.nama_santri || '-'}</TableCell>
+                                                <TableCell>{item.kategori?.nama_kategori || '-'}</TableCell>
+                                                <TableCell>{item.asrama?.nama_asrama || '-'}</TableCell>
+                                                <TableCell>{new Date(item.tanggal_diterima).toLocaleDateString('id-ID')}</TableCell>
+                                                <TableCell>{renderStatus(item.status_paket)}</TableCell>
+                                                <TableCell className="text-right space-x-2">
+                                                    <Can permission="paket_edit">
+                                                        <Button variant="link" size="sm">
+                                                            <Pencil/>
+                                                            <Link href={route('paket.edit', item.id)}>
+                                                                Edit
+                                                            </Link>
+                                                        </Button>
+                                                    </Can>
+                                                    <Can permission="paket_delete">
+                                                        <Button
+                                                            variant="link"
+                                                            size="sm"
+                                                            className="text-red-500 cursor-pointer"
+                                                            onClick={() => handleDeleteClick(item.id)}
+                                                        >
+                                                            <Trash/>
+                                                            Hapus
+                                                        </Button>
+                                                    </Can>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </Can>
                                 </TableBody>
                             </Table>
                         </div>

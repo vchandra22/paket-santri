@@ -29,7 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // route paket
-    Route::prefix('paket')->group(function () {
+    Route::prefix('paket')->middleware(['permission:paket_access'])->group(function () {
         Route::get('/', [PaketController::class, 'index'])->name('paket.index');
         Route::get('/create', [PaketController::class, 'create'])->name('paket.create');
         Route::post('/store', [PaketController::class, 'store'])->name('paket.store');
@@ -49,7 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // route kategori paket
-    Route::prefix('kategori-paket')->group(function () {
+    Route::prefix('kategori-paket')->middleware(['permission:kategori_access'])->group(function () {
         Route::get('/', [KategoriPaketController::class, 'index'])->name('kategori_paket.index');
         Route::get('/create', [KategoriPaketController::class, 'create'])->name('kategori_paket.create');
         Route::post('/store', [KategoriPaketController::class, 'store'])->name('kategori_paket.store');

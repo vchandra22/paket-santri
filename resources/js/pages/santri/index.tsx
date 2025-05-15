@@ -16,6 +16,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast, Toaster } from 'sonner';
 import { Pencil, Trash } from 'lucide-react';
+import Can from '@/components/permission/Can';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -91,9 +92,11 @@ export default function SantriIndex({ santris, status, success, error }: Props) 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Data Santri</h1>
-                    <Button asChild>
-                        <Link href={route('santri.create')}>Tambah Santri</Link>
-                    </Button>
+                    <Can permission="santri_create">
+                        <Button asChild>
+                            <Link href={route('santri.create')}>Tambah Santri</Link>
+                        </Button>
+                    </Can>
                 </div>
 
                 <div className="rounded-xl border border-slate-200 p-4">
@@ -114,24 +117,30 @@ export default function SantriIndex({ santris, status, success, error }: Props) 
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {santris.map((santri, index) => (
-                                        <TableRow key={santri.id}>
-                                            <TableCell>{index + 1}</TableCell>
-                                            <TableCell>{santri.nama_santri}</TableCell>
-                                            <TableCell>{santri.nis}</TableCell>
-                                            <TableCell>{santri.asrama?.nama_asrama || '-'}</TableCell>
-                                            <TableCell>{santri.paket?.nama_paket || '-'}</TableCell>
-                                            <TableCell className="space-x-2 text-right">
-                                                <Button variant="link" size="sm">
-                                                    <Pencil/>
-                                                    <Link href={route('santri.edit', { santri: santri.nis })}>Edit</Link>
-                                                </Button>
-                                                <Button variant="link" size="sm" className="text-red-500 cursor-pointer" onClick={() => handleDeleteClick(santri.nis)}>
-                                                    <Trash /> Hapus
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+                                    <Can permission="santri_view">
+                                        {santris.map((santri, index) => (
+                                            <TableRow key={santri.id}>
+                                                <TableCell>{index + 1}</TableCell>
+                                                <TableCell>{santri.nama_santri}</TableCell>
+                                                <TableCell>{santri.nis}</TableCell>
+                                                <TableCell>{santri.asrama?.nama_asrama || '-'}</TableCell>
+                                                <TableCell>{santri.paket?.nama_paket || '-'}</TableCell>
+                                                <TableCell className="space-x-2 text-right">
+                                                    <Can permission="santri_edit">
+                                                        <Button variant="link" size="sm">
+                                                            <Pencil/>
+                                                            <Link href={route('santri.edit', { santri: santri.nis })}>Edit</Link>
+                                                        </Button>
+                                                    </Can>
+                                                    <Can permission="santri_delete">
+                                                        <Button variant="link" size="sm" className="text-red-500 cursor-pointer" onClick={() => handleDeleteClick(santri.nis)}>
+                                                            <Trash /> Hapus
+                                                        </Button>
+                                                    </Can>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </Can>
                                 </TableBody>
                             </Table>
                         </div>

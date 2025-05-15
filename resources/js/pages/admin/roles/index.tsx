@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -113,8 +113,7 @@ export default function Index({ auth, roles, permissions }: IndexProps) {
     const handleDelete = () => {
         if (!roleToDelete) return;
 
-        post(route('admin.roles.destroy', roleToDelete.id), {
-            method: 'delete',
+        router.delete(route('admin.roles.destroy', roleToDelete.id), {
             onSuccess: () => {
                 toast.success('Role deleted successfully');
                 setIsDeleteDialogOpen(false);

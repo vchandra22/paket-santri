@@ -33,9 +33,10 @@ import {
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 
-import { Package, AlertCircle, MoreHorizontal, Filter, Inbox } from 'lucide-react';
+import { Package, AlertCircle, MoreHorizontal, Filter, Inbox, Pencil } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { Link } from '@inertiajs/react';
+import Can from '@/components/permission/Can';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 interface ChartDataItem {
@@ -371,8 +372,16 @@ export default function Dashboard({
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                                                            <DropdownMenuItem>Detail</DropdownMenuItem>
-                                                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                                                            <DropdownMenuItem>
+                                                                <Can permission="paket_edit">
+                                                                    <Button variant="link" size="sm">
+                                                                        <Pencil/>
+                                                                        <Link href={route('paket.edit', paket.id)}>
+                                                                            Edit
+                                                                        </Link>
+                                                                    </Button>
+                                                                </Can>
+                                                            </DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
                                                 </TableCell>

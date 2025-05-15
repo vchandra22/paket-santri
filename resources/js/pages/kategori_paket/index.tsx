@@ -16,6 +16,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { toast, Toaster } from 'sonner';
 import { Pencil, Trash } from 'lucide-react';
+import Can from '@/components/permission/Can';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -84,9 +85,11 @@ export default function KategoriPaketIndex({ kategori, status, success, error }:
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Data Kategori Paket</h1>
-                    <Button asChild>
-                        <Link href={route('kategori_paket.create')}>Tambah Kategori</Link>
-                    </Button>
+                    <Can permission="kategori_create">
+                        <Button asChild>
+                            <Link href={route('kategori_paket.create')}>Tambah Kategori</Link>
+                        </Button>
+                    </Can>
                 </div>
 
                 <div className="rounded-xl border border-slate-200 p-4">
@@ -104,22 +107,28 @@ export default function KategoriPaketIndex({ kategori, status, success, error }:
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {kategori.map((item, index) => (
-                                        <TableRow key={item.id}>
-                                            <TableCell>{index + 1}</TableCell>
-                                            <TableCell>{item.nama_kategori}</TableCell>
-                                            <TableCell className="space-x-2 text-right">
-                                                <Button variant="link" size="sm">
-                                                    <Pencil />
-                                                    <Link href={route('kategori_paket.edit', item.id)}>Edit</Link>
-                                                </Button>
-                                                <Button variant="link" className="text-red-500 cursor-pointer" size="sm" onClick={() => handleDeleteClick(item.id)}>
-                                                    <Trash />
-                                                    Hapus
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+                                    <Can permission="kategori_view">
+                                        {kategori.map((item, index) => (
+                                            <TableRow key={item.id}>
+                                                <TableCell>{index + 1}</TableCell>
+                                                <TableCell>{item.nama_kategori}</TableCell>
+                                                <TableCell className="space-x-2 text-right">
+                                                    <Can permission="kategori_edit">
+                                                        <Button variant="link" size="sm">
+                                                            <Pencil />
+                                                            <Link href={route('kategori_paket.edit', item.id)}>Edit</Link>
+                                                        </Button>
+                                                    </Can>
+                                                    <Can permission="kategori_delete">
+                                                        <Button variant="link" className="text-red-500 cursor-pointer" size="sm" onClick={() => handleDeleteClick(item.id)}>
+                                                            <Trash />
+                                                            Hapus
+                                                        </Button>
+                                                    </Can>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </Can>
                                 </TableBody>
                             </Table>
                         </div>
