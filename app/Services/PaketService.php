@@ -1,8 +1,10 @@
 <?php
 namespace App\Services;
 
+use App\Exports\PaketExport;
 use App\Repositories\Paket\PaketRepository;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PaketService
 {
@@ -60,5 +62,13 @@ class PaketService
             DB::rollBack();
             throw $e;
         }
+    }
+
+    /**
+     * Export paket to Excel
+     */
+    public function exportToExcel($filename = 'paket-data')
+    {
+        return Excel::download(new PaketExport(), $filename . '.xlsx');
     }
 }

@@ -104,4 +104,12 @@ class PaketController extends Controller
 
         return redirect()->route('paket.index')->with('success', 'Data paket berhasil dihapus');
     }
+
+    /**
+     * Export to Excel
+     */
+    public function export()
+    {
+        return $this->paketService->exportToExcel('data-paket-' . date('Y-m-d'));
+    }
 }

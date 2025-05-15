@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/select';
 import { toast, Toaster } from 'sonner';
 import { format } from 'date-fns';
+import { Textarea } from '@/components/ui/textarea';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -270,7 +271,7 @@ export default function PaketForm({ paket, santri, kategori, asrama }: Props) {
 
                                 <div className="space-y-2">
                                     <Label htmlFor="isi_paket_disita">Isi Paket Disita</Label>
-                                    <Input
+                                    <Textarea
                                         id="isi_paket_disita"
                                         value={data.isi_paket_disita}
                                         onChange={(e) => setData('isi_paket_disita', e.target.value)}

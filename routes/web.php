@@ -55,7 +55,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/{kategori_paket}/destroy', [KategoriPaketController::class, 'destroy'])->name('kategori_paket.destroy');
     });
 
+    // route untuk export excel
+    Route::get('/paket/export', [PaketController::class, 'export'])->name('paket.export');
 });
+
+// Rute dengan role admin
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/users', function () {
+        return Inertia::render('admin/users/index');
+    })->name('admin.users.index');
+
+    Route::get('/roles', function () {
+        return Inertia::render('admin/roles/index');
+    })->name('admin.roles.index');
+
+    Route::get('/permission', function () {
+        return Inertia::render('admin/permission/index');
+    })->name('admin.permission.index');
+});
+
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

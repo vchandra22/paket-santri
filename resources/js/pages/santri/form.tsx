@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { toast, Toaster } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
@@ -24,7 +25,7 @@ interface Santri {
 
 interface Props {
     santri?: Santri;
-    asrama: Array<{ id: number; nama_asrama: string }>;
+    asrama: Array<{ id: number; nama_asrama: string; gedung: string }>;
 }
 
 export default function SantriForm({ santri, asrama }: Props) {
@@ -99,7 +100,7 @@ export default function SantriForm({ santri, asrama }: Props) {
 
                             <div className="space-y-2">
                                 <Label htmlFor="alamat">Alamat</Label>
-                                <Input
+                                <Textarea
                                     id="alamat"
                                     value={data.alamat}
                                     onChange={(e) => setData('alamat', e.target.value)}
@@ -121,7 +122,7 @@ export default function SantriForm({ santri, asrama }: Props) {
                                     <SelectContent>
                                         {asrama.map((item) => (
                                             <SelectItem key={item.id} value={item.id.toString()}>
-                                                {item.nama_asrama}
+                                                {item.nama_asrama} - {item.gedung}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

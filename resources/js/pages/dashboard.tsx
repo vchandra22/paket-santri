@@ -55,7 +55,7 @@ interface PackageItem {
     status_paket: 'sudah_diambil' | 'belum_diambil';
     isi_paket_disita: boolean;
     santri?: {
-        nama: string;
+        nama_santri: string;
     };
     kategori?: {
         nama_kategori: string;
@@ -109,14 +109,13 @@ export default function Dashboard({
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    {/* Statistics Cards */}
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Total Paket Belum Diambil</CardTitle>
+                            <CardTitle className="text-sm font-medium">Paket Belum Diambil</CardTitle>
                             <Package className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{statistics.notPickedUp}</div>
+                            <div className="text-4xl font-bold min-h-20">{statistics.notPickedUp}</div>
                             <p className="text-xs text-muted-foreground">
                                 Paket yang menunggu untuk diambil
                             </p>
@@ -129,7 +128,7 @@ export default function Dashboard({
                             <AlertCircle className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{statistics.confiscated}</div>
+                            <div className="text-4xl font-bold min-h-20">{statistics.confiscated}</div>
                             <p className="text-xs text-muted-foreground">
                                 Paket dengan barang yang disita
                             </p>
@@ -142,7 +141,7 @@ export default function Dashboard({
                             <Inbox className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">
+                            <div className="text-4xl font-bold min-h-20">
                                 {chartData.daily.reduce((total, item) => total + item.total, 0)}
                             </div>
                             <p className="text-xs text-muted-foreground">
@@ -157,7 +156,7 @@ export default function Dashboard({
                             <Filter className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">
+                            <div className="text-2xl font-semibold min-h-20">
                                 {categoryData.length > 0 ? categoryData[0].name : '-'}
                             </div>
                             <p className="text-xs text-muted-foreground">
@@ -317,7 +316,7 @@ export default function Dashboard({
                             <CardTitle>Paket Terbaru</CardTitle>
                             <CardDescription>5 paket terakhir yang diterima</CardDescription>
                         </div>
-                        <Link href="/packages">
+                        <Link href="/paket">
                             <Button variant="outline" size="sm">
                                 Lihat Semua
                             </Button>
@@ -341,7 +340,7 @@ export default function Dashboard({
                                         {latestPackages.map((paket) => (
                                             <TableRow key={paket.id}>
                                                 <TableCell className="font-medium">{paket.nama_paket}</TableCell>
-                                                <TableCell>{paket.santri?.nama || '-'}</TableCell>
+                                                <TableCell>{paket.santri?.nama_santri || '-'}</TableCell>
                                                 <TableCell>{formatDate(paket.tanggal_diterima)}</TableCell>
                                                 <TableCell>{paket.kategori?.nama_kategori || '-'}</TableCell>
                                                 <TableCell>

@@ -133,9 +133,17 @@ export default function PaketIndex({ paket, status, success, error }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Data Paket</h1>
-                    <Button asChild>
-                        <Link href={route('paket.create')}>Tambah Paket</Link>
-                    </Button>
+                    <div className="flex justify-end gap-4">
+                        <a
+                            href={route('paket.export')}
+                            className="bg-green-700 hover:bg-green-700/90 text-primary-foreground rounded-sm shadow-xs text-sm font-medium h-9 px-4 py-2 has-[>svg]:px-3"
+                        >
+                            Export to Excel
+                        </a>
+                        <Button asChild>
+                            <Link href={route('paket.create')}>Tambah Paket</Link>
+                        </Button>
+                    </div>
                 </div>
 
             <div className="border border-slate-200 rounded-xl p-4">
