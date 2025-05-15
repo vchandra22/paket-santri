@@ -12,19 +12,12 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $roles = Role::with('permission')->get();
-
-        return Inertia::render('admin/roles/index', [
-            'roles' => $roles
-        ]);
-    }
-
-    public function create()
-    {
+        $roles = Role::with('permissions')->get();
         $permissions = Permission::all();
 
-        return Inertia::render('admin/roles/create', [
-            'permission' => $permissions
+        return Inertia::render('admin/roles/index', [
+            'roles' => $roles,
+            'permissions' => $permissions
         ]);
     }
 
@@ -32,37 +25,35 @@ class RoleController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:roles',
-            'permissions' => 'required|array', // Change 'permission' to 'permissions'
+            'permissions' => 'nullable|array',
         ]);
 
         $role = Role::create(['name' => $request->name]);
-        $role->givePermissionTo($request->permissions);
 
-        return redirect()->route('admin.roles.index')
+        if ($request->has('permissions')) {
+            $role->givePermissionTo($request->permissions);
+        }
+
+        return redirect()->back()
             ->with('message', 'Role berhasil dibuat');
-    }
-
-    public function edit(Role $role)
-    {
-        $permissions = Permission::all();
-
-        return Inertia::render('admin/roles/edit', [
-            'role' => $role->load('permission'),
-            'permission' => $permissions
-        ]);
     }
 
     public function update(Request $request, Role $role)
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
-            'permissions' => 'required|array',
+            'permissions' => 'nullable|array',
         ]);
 
         $role->update(['name' => $request->name]);
-        $role->syncPermissions($request->permissions);
 
-        return redirect()->route('admin.roles.index')
+        if ($request->has('permissions')) {
+            $role->syncPermissions($request->permissions);
+        } else {
+            $role->syncPermissions([]);
+        }
+
+        return redirect()->back()
             ->with('message', 'Role berhasil diperbarui');
     }
 
@@ -70,7 +61,7 @@ class RoleController extends Controller
     {
         $role->delete();
 
-        return redirect()->route('admin.roles.index')
+        return redirect()->back()
             ->with('message', 'Role berhasil dihapus');
     }
 }

@@ -1,7 +1,7 @@
-import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { Head, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
     Table,
     TableBody,
@@ -22,10 +22,11 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast, Toaster } from 'sonner';
 import { Edit, Plus, Trash } from 'lucide-react';
-import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
 import AppLayout from '@/layouts/app-layout';
+import { Badge } from '@/components/ui/badge';
 import Can from '@/components/permission/Can';
+import PermissionCheckbox from '@/components/permission/PermissionCheckbox';
+import type { BreadcrumbItem } from '@/types';
 
 interface Permission {
     id: number;
@@ -35,7 +36,7 @@ interface Permission {
 interface Role {
     id: number;
     name: string;
-    permission: Permission[];
+    permissions: Permission[]; // Changed from 'permission' to 'permissions'
     created_at: string;
     updated_at: string;
 }
@@ -44,7 +45,6 @@ interface User {
     id: number;
     name: string;
     email: string;
-    // Add other properties as needed
 }
 
 interface IndexProps {
@@ -52,15 +52,62 @@ interface IndexProps {
         user: User;
     };
     roles: Role[];
+    permissions: Permission[]; // Changed from 'permission' to 'permissions'
 }
 
-export default function Index({ auth, roles }: IndexProps) {
+export default function Index({ auth, roles, permissions }: IndexProps) {
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [roleToEdit, setRoleToEdit] = useState<Role | null>(null);
     const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
+
+    const { data, setData, post, put, processing, reset, errors } = useForm({
+        name: '',
+        permissions: [] as number[],
+    });
+
+    const openCreateDialog = () => {
+        reset();
+        setIsCreateDialogOpen(true);
+    };
+
+    const openEditDialog = (role: Role) => {
+        setData({
+            name: role.name,
+            permissions: role.permissions.map(p => p.id), // Changed from 'permission' to 'permissions'
+        });
+        setRoleToEdit(role);
+        setIsEditDialogOpen(true);
+    };
 
     const openDeleteDialog = (role: Role) => {
         setRoleToDelete(role);
         setIsDeleteDialogOpen(true);
+    };
+
+    const handleCreate = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(route('admin.roles.store'), {
+            onSuccess: () => {
+                toast.success('Role created successfully');
+                setIsCreateDialogOpen(false);
+                reset();
+            },
+        });
+    };
+
+    const handleUpdate = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!roleToEdit) return;
+
+        put(route('admin.roles.update', roleToEdit.id), {
+            onSuccess: () => {
+                toast.success('Role updated successfully');
+                setIsEditDialogOpen(false);
+                reset();
+            },
+        });
     };
 
     const handleDelete = () => {
@@ -75,29 +122,39 @@ export default function Index({ auth, roles }: IndexProps) {
         });
     };
 
+    const handlePermissionChange = (selectedIds: number[]) => {
+        setData('permissions', selectedIds);
+    };
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+        },
+        {
+            title: 'Roles',
+            href: '/admin/roles',
+        },
+    ];
+
     return (
-        <AppLayout
-            user={auth.user}
-            header={<h2 className="text-xl font-semibold leading-tight">Manage Roles</h2>}
-        >
+        <AppLayout user={auth.user} breadcrumbs={breadcrumbs}>
             <Head title="Manage Roles" />
             <Toaster position="top-right" richColors />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <CardTitle>Roles</CardTitle>
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                <div className="flex items-center justify-between">
+                    <div className="border border-slate-200 rounded-lg p-4 w-full">
+                        <div className="flex flex-row items-center justify-between">
+                            <h4 className="text-lg mb-2">Roles</h4>
                             <Can permission="role_create">
-                                <Button asChild className="flex items-center gap-1">
-                                    <Link href={route('admin.roles.create')}>
-                                        <Plus className="h-4 w-4" />
-                                        Add Role
-                                    </Link>
+                                <Button onClick={openCreateDialog} className="flex items-center gap-1">
+                                    <Plus className="h-4 w-4" />
+                                    Add Role
                                 </Button>
                             </Can>
-                        </CardHeader>
-                        <CardContent>
+                        </div>
+                        <div>
                             <Table>
                                 <TableHeader>
                                     <TableRow>
@@ -115,14 +172,14 @@ export default function Index({ auth, roles }: IndexProps) {
                                             <TableCell>{role.name}</TableCell>
                                             <TableCell>
                                                 <div className="flex flex-wrap gap-1">
-                                                    {role.permission.slice(0, 3).map((permission) => (
+                                                    {role.permissions.slice(0, 3).map((permission) => ( // Changed from 'permission' to 'permissions'
                                                         <Badge key={permission.id} variant="outline" className="mr-1">
                                                             {permission.name}
                                                         </Badge>
                                                     ))}
-                                                    {role.permission.length > 3 && (
+                                                    {role.permissions.length > 3 && ( // Changed from 'permission' to 'permissions'
                                                         <Badge variant="outline">
-                                                            +{role.permission.length - 3} more
+                                                            +{role.permissions.length - 3} more
                                                         </Badge>
                                                     )}
                                                 </div>
@@ -133,15 +190,13 @@ export default function Index({ auth, roles }: IndexProps) {
                                             <TableCell className="text-right space-x-2">
                                                 <Can permission="role_edit">
                                                     <Button
-                                                        asChild
+                                                        onClick={() => openEditDialog(role)}
                                                         variant="outline"
                                                         size="sm"
                                                         className="inline-flex items-center gap-1"
                                                     >
-                                                        <Link href={route('admin.roles.edit', role.id)}>
-                                                            <Edit className="h-4 w-4" />
-                                                            Edit
-                                                        </Link>
+                                                        <Edit className="h-4 w-4" />
+                                                        Edit
                                                     </Button>
                                                 </Can>
                                                 <Can permission="role_delete">
@@ -160,10 +215,120 @@ export default function Index({ auth, roles }: IndexProps) {
                                     ))}
                                 </TableBody>
                             </Table>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            {/* Create Role Dialog */}
+            <AlertDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                <AlertDialogContent className="max-w-2xl">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Create New Role</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Enter the name for the new role and select permissions.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <form onSubmit={handleCreate}>
+                        <div className="mb-4">
+                            <label htmlFor="name" className="block text-sm font-medium">
+                                Role Name
+                            </label>
+                            <Input
+                                id="name"
+                                type="text"
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                className={errors.name ? 'border-red-500' : ''}
+                                placeholder="Enter role name"
+                            />
+                            {errors.name && (
+                                <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                            )}
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-2">
+                                Permissions
+                            </label>
+                            <div className="max-h-[300px] overflow-y-auto">
+                                <PermissionCheckbox
+                                    permissions={permissions} // Changed from 'permission' to 'permissions'
+                                    selectedPermissions={data.permissions}
+                                    onChange={handlePermissionChange}
+                                />
+                            </div>
+                            {errors.permissions && (
+                                <p className="mt-1 text-sm text-red-500">{errors.permissions}</p>
+                            )}
+                        </div>
+
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction asChild>
+                                <Button type="submit" disabled={processing}>
+                                    {processing ? 'Creating...' : 'Create'}
+                                </Button>
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </form>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Edit Role Dialog */}
+            <AlertDialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                <AlertDialogContent className="max-w-2xl">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Edit Role</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Update the role name and permissions.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <form onSubmit={handleUpdate}>
+                        <div className="mb-4">
+                            <label htmlFor="edit-name" className="block text-sm font-medium">
+                                Role Name
+                            </label>
+                            <Input
+                                id="edit-name"
+                                type="text"
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                className={errors.name ? 'border-red-500' : ''}
+                                placeholder="Enter role name"
+                            />
+                            {errors.name && (
+                                <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                            )}
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-2">
+                                Permissions
+                            </label>
+                            <div className="max-h-[300px] overflow-y-auto">
+                                <PermissionCheckbox
+                                    permissions={permissions} // Changed from 'permission' to 'permissions'
+                                    selectedPermissions={data.permissions}
+                                    onChange={handlePermissionChange}
+                                />
+                            </div>
+                            {errors.permissions && (
+                                <p className="mt-1 text-sm text-red-500">{errors.permissions}</p>
+                            )}
+                        </div>
+
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction asChild>
+                                <Button type="submit" disabled={processing}>
+                                    {processing ? 'Updating...' : 'Update'}
+                                </Button>
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </form>
+                </AlertDialogContent>
+            </AlertDialog>
 
             {/* Delete Role Dialog */}
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

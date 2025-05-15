@@ -13,17 +13,10 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with('roles')->get();
-
-        return Inertia::render('admin/users/index', [
-            'users' => $users
-        ]);
-    }
-
-    public function create()
-    {
         $roles = Role::all();
 
-        return Inertia::render('admin/users/create', [
+        return Inertia::render('admin/users/index', [
+            'users' => $users,
             'roles' => $roles
         ]);
     }
@@ -45,18 +38,8 @@ class UserController extends Controller
 
         $user->assignRole($request->roles);
 
-        return redirect()->route('admin.users.index')
+        return redirect()->back()
             ->with('message', 'User berhasil dibuat');
-    }
-
-    public function edit(User $user)
-    {
-        $roles = Role::all();
-
-        return Inertia::render('admin/users/edit', [
-            'user' => $user->load('roles'),
-            'roles' => $roles
-        ]);
     }
 
     public function update(Request $request, User $user)
@@ -64,6 +47,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8|confirmed',
             'roles' => 'required|array',
         ]);
 
@@ -73,17 +57,13 @@ class UserController extends Controller
         ];
 
         if ($request->filled('password')) {
-            $request->validate([
-                'password' => 'string|min:8|confirmed',
-            ]);
-
             $data['password'] = bcrypt($request->password);
         }
 
         $user->update($data);
         $user->syncRoles($request->roles);
 
-        return redirect()->route('admin.users.index')
+        return redirect()->back()
             ->with('message', 'User berhasil diperbarui');
     }
 
@@ -91,7 +71,7 @@ class UserController extends Controller
     {
         $user->delete();
 
-        return redirect()->route('admin.users.index')
+        return redirect()->back()
             ->with('message', 'User berhasil dihapus');
     }
 }

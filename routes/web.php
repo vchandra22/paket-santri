@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AsramaController;
 use App\Http\Controllers\DashboardController;
@@ -18,7 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // route santri
-    Route::prefix('santri')->group(function () {
+    Route::prefix('santri')->middleware(['permission:santri_access'])->group(function () {
         Route::get('/', [SantriController::class, 'index'])->name('santri.index');
         Route::get('/create', [SantriController::class, 'create'])->name('santri.create');
         Route::post('/store', [SantriController::class, 'store'])->name('santri.store');
@@ -38,7 +39,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // route asrama
-    Route::prefix('asrama')->group(function () {
+    Route::prefix('asrama')->middleware(['permission:asrama_access'])->group(function () {
         Route::get('/', [AsramaController::class, 'index'])->name('asrama.index');
         Route::get('/create', [AsramaController::class, 'create'])->name('asrama.create');
         Route::post('/store', [AsramaController::class, 'store'])->name('asrama.store');
@@ -64,14 +65,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Rute dengan role admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
-    Route::get('/users/create', [UserController::class, 'create'])->name('admin.users.create');
     Route::post('/users/store', [UserController::class, 'store'])->name('admin.users.store');
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
     Route::put('/users/{user}/update', [UserController::class, 'update'])->name('admin.users.update');
 
-    Route::get('/roles', function () {
-        return Inertia::render('admin/roles/index');
-    })->name('admin.roles.index');
+    Route::get('/roles', [RoleController::class, 'index'])->name('admin.roles.index');
+    Route::post('/roles', [RoleController::class, 'store'])->name('admin.roles.store');
+    Route::put('/roles/{role}/update', [RoleController::class, 'update'])->name('admin.roles.update');
+    Route::delete('/roles/{role}/destroy', [RoleController::class, 'destroy'])->name('admin.roles.destroy');
 
     Route::get('/permissions', [PermissionController::class, 'index'])->name('admin.permissions.index');
     Route::post('/permissions', [PermissionController::class, 'store'])->name('admin.permissions.store');

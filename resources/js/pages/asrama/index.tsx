@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
 import { Pen, Pencil, Trash } from 'lucide-react';
+import Can from '@/components/permission/Can';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -88,9 +89,11 @@ export default function AsramaIndex({ asrama, success, error }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Data Asrama</h1>
-                    <Button asChild>
-                        <Link href={route('asrama.create')}>Tambah Asrama</Link>
-                    </Button>
+                    <Can permission="asrama_create">
+                        <Button asChild>
+                            <Link href={route('asrama.create')}>Tambah Asrama</Link>
+                        </Button>
+                    </Can>
                 </div>
 
                 <div className="border border-slate-200 rounded-xl p-4">
@@ -115,21 +118,25 @@ export default function AsramaIndex({ asrama, success, error }: Props) {
                                             <TableCell>{item.nama_asrama}</TableCell>
                                             <TableCell>{item.gedung}</TableCell>
                                             <TableCell className="text-right space-x-2">
-                                                <Button variant="link" size="sm">
-                                                    <Pencil/>
-                                                    <Link href={route('asrama.edit', item.id)}>
-                                                        Edit
-                                                    </Link>
-                                                </Button>
-                                                <Button
-                                                    variant="link"
-                                                    size="sm"
-                                                    className="text-red-500 cursor-pointer"
-                                                    onClick={() => handleDeleteClick(item.id)}
-                                                >
-                                                    <Trash/>
-                                                    Hapus
-                                                </Button>
+                                                <Can permission="asrama_edit">
+                                                    <Button variant="link" size="sm" asChild>
+                                                        <Link href={route('asrama.edit', item.id)}>
+                                                            <Pencil className="mr-1 h-4 w-4" />
+                                                            Edit
+                                                        </Link>
+                                                    </Button>
+                                                </Can>
+                                                <Can permission="asrama_delete">
+                                                    <Button
+                                                        variant="link"
+                                                        size="sm"
+                                                        className="text-red-500"
+                                                        onClick={() => handleDeleteClick(item.id)}
+                                                    >
+                                                        <Trash className="mr-1 h-4 w-4" />
+                                                        Hapus
+                                                    </Button>
+                                                </Can>
                                             </TableCell>
                                         </TableRow>
                                     ))}
