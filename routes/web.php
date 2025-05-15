@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AsramaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KategoriPaketController;
@@ -61,17 +63,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Rute dengan role admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    Route::get('/users', function () {
-        return Inertia::render('admin/users/index');
-    })->name('admin.users.index');
+    Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
+    Route::get('/users/create', [UserController::class, 'create'])->name('admin.users.create');
+    Route::post('/users/store', [UserController::class, 'store'])->name('admin.users.store');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
+    Route::put('/users/{user}/update', [UserController::class, 'update'])->name('admin.users.update');
 
     Route::get('/roles', function () {
         return Inertia::render('admin/roles/index');
     })->name('admin.roles.index');
 
-    Route::get('/permission', function () {
-        return Inertia::render('admin/permission/index');
-    })->name('admin.permission.index');
+    Route::get('/permissions', [PermissionController::class, 'index'])->name('admin.permissions.index');
+    Route::post('/permissions', [PermissionController::class, 'store'])->name('admin.permissions.store');
+    Route::put('/permissions/{permission}/update', [PermissionController::class, 'update'])->name('admin.permissions.update');
+    Route::delete('/permissions/{permission}/destroy', [PermissionController::class, 'destroy'])->name('admin.permissions.destroy');
 });
 
 
