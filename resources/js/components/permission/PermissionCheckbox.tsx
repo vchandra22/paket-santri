@@ -42,11 +42,11 @@ export default function PermissionCheckbox({
     return (
         <div className="space-y-6">
             {Object.entries(groupedPermissions).map(([group, perms]) => (
-                <Card key={group}>
-                    <CardHeader className="pb-3">
-                        <CardTitle className="text-md font-medium capitalize">{group}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                <div key={group} className="py-2 rounded-lg">
+                    <div className="pb-3">
+                        <h4 className="text-md font-medium capitalize">{group}</h4>
+                    </div>
+                    <div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             {perms.map((permission) => (
                                 <div key={permission.id} className="flex items-center space-x-2">
@@ -77,8 +77,8 @@ export default function PermissionCheckbox({
                                 </div>
                             ))}
                         </div>
-                    </CardContent>
-                </Card>
+                    </div>
+                </div>
             ))}
         </div>
     );

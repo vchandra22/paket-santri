@@ -16,7 +16,7 @@ class PaketRepository implements BaseRepositoryInterface
 
     public function all()
     {
-        return $this->model->with('santri', 'kategori', 'asrama')->get();
+        return $this->model->with('santri', 'kategori', 'asrama')->latest()->get();
     }
 
     public function find($id)

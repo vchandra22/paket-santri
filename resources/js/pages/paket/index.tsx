@@ -10,7 +10,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast, Toaster } from 'sonner';
 import {
     AlertDialog,
@@ -24,8 +23,9 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Pencil, Trash } from 'lucide-react';
+import { Pencil, Search, Trash } from 'lucide-react';
 import Can from '@/components/permission/Can';
+import { Input } from '@/components/ui/input';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -80,6 +80,13 @@ interface Props {
 export default function PaketIndex({ paket, status, success, error }: Props) {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [paketToDelete, setPaketToDelete] = useState<number | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredPaket = paket.filter((item) =>
+        item.nama_paket.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.santri?.nama_santri?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.asrama?.nama_asrama?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     if (status) {
         toast.success(status);
@@ -151,6 +158,17 @@ export default function PaketIndex({ paket, status, success, error }: Props) {
                     </div>
                 </div>
 
+                <div className="relative w-full max-w-md">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+                    <Input
+                        type="text"
+                        placeholder="Cari nama paket atau nama penerima ..."
+                        className="pl-10"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+
             <div className="border border-slate-200 rounded-xl p-4">
                     <div>
                         <h4 className="text-lg mb-2">Daftar Paket</h4>
@@ -172,7 +190,7 @@ export default function PaketIndex({ paket, status, success, error }: Props) {
                                 </TableHeader>
                                 <TableBody>
                                     <Can permission="paket_view">
-                                        {paket.map((item, index) => (
+                                        {filteredPaket.map((item, index) => (
                                             <TableRow key={item.id}>
                                                 <TableCell>{index + 1}</TableCell>
                                                 <TableCell>{item.nama_paket}</TableCell>

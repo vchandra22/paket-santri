@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AsramaController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KategoriPaketController;
 use App\Http\Controllers\PaketController;
@@ -11,9 +12,7 @@ use App\Http\Controllers\SantriController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
+Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -60,6 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // route untuk export excel
     Route::get('/paket/export', [PaketController::class, 'export'])->name('paket.export');
+    Route::get('/santri/export', [SantriController::class, 'export'])->name('santri.export');
 });
 
 // Rute dengan role admin

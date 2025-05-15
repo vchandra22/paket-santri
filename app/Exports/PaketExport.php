@@ -25,7 +25,7 @@ class PaketExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
     public function headings(): array
     {
         return [
-            'ID',
+            'NIS',
             'Nama Paket',
             'Tanggal Diterima',
             'Kategori Paket',
@@ -47,11 +47,11 @@ class PaketExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
     public function map($row): array
     {
         return [
-            $row->id,
+            $row->santri ? $row->santri->nis : '',
             $row->nama_paket,
             $row->tanggal_diterima,
             $row->kategori ? $row->kategori->nama_kategori : '',
-            $row->santri ? $row->santri->nama_lengkap : '',
+            $row->santri ? $row->santri->nama_santri : '',
             $row->asrama ? $row->asrama->nama_asrama : '',
             $row->pengirim_paket,
             $row->isi_paket_disita,

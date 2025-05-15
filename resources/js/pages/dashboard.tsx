@@ -53,7 +53,7 @@ interface PackageItem {
     id: number;
     nama_paket: string;
     tanggal_diterima: string;
-    status_paket: 'sudah_diambil' | 'belum_diambil';
+    status_paket: 'diambil' | 'belum diambil';
     isi_paket_disita: boolean;
     santri?: {
         nama_santri: string;
@@ -347,14 +347,14 @@ export default function Dashboard({
                                                 <TableCell>
                                                     <Badge
                                                         variant={
-                                                            paket.status_paket === 'sudah_diambil'
+                                                            paket.status_paket === 'diambil'
                                                                 ? 'outline'
                                                                 : paket.isi_paket_disita
                                                                     ? 'destructive'
                                                                     : 'secondary'
                                                         }
                                                     >
-                                                        {paket.status_paket === 'sudah_diambil'
+                                                        {paket.status_paket === 'diambil'
                                                             ? 'Sudah Diambil'
                                                             : paket.isi_paket_disita
                                                                 ? 'Disita'

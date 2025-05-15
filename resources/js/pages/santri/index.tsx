@@ -13,10 +13,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast, Toaster } from 'sonner';
-import { Pencil, Trash } from 'lucide-react';
+import { Pencil, Search, Trash } from 'lucide-react';
 import Can from '@/components/permission/Can';
+import { Input } from '@/components/ui/input';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -33,11 +34,9 @@ interface Santri {
     id: number;
     nama_santri: string;
     nis: string;
+    total_paket_diterima: string;
     asrama: {
         nama_asrama: string;
-    } | null;
-    paket: {
-        nama_paket: string;
     } | null;
 }
 
@@ -50,7 +49,19 @@ interface Props {
 
 export default function SantriIndex({ santris, status, success, error }: Props) {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [santriToDelete, setSantriToDelete] = useState<number | null>(null);
+    const [santriToDelete, setSantriToDelete] = useState<string | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredSantris = useMemo(() => {
+        if (!searchTerm) return santris;
+
+        const term = searchTerm.toLowerCase();
+        return santris.filter(santri =>
+            santri.nama_santri.toLowerCase().includes(term) ||
+            santri.nis.toLowerCase().includes(term) ||
+            (santri.asrama?.nama_asrama || '').toLowerCase().includes(term)
+        );
+    }, [santris, searchTerm]);
 
     if (status) {
         toast.success(status);
@@ -92,11 +103,32 @@ export default function SantriIndex({ santris, status, success, error }: Props) 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Data Santri</h1>
-                    <Can permission="santri_create">
-                        <Button asChild>
-                            <Link href={route('santri.create')}>Tambah Santri</Link>
-                        </Button>
-                    </Can>
+                    <div className="flex justify-end gap-4">
+                        <Can permission="santri_export">
+                            <a
+                                href={route('santri.export')}
+                                className="bg-green-700 hover:bg-green-700/90 text-primary-foreground rounded-sm shadow-xs text-sm font-medium h-9 px-4 py-2 has-[>svg]:px-3"
+                            >
+                                Export to Excel
+                            </a>
+                        </Can>
+                        <Can permission="santri_create">
+                            <Button asChild>
+                                <Link href={route('santri.create')}>Tambah Santri</Link>
+                            </Button>
+                        </Can>
+                    </div>
+                </div>
+
+                <div className="relative w-full max-w-md">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+                    <Input
+                        type="text"
+                        placeholder="Cari santri (nama, NIS, atau asrama)..."
+                        className="pl-10"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                 </div>
 
                 <div className="rounded-xl border border-slate-200 p-4">
@@ -112,19 +144,19 @@ export default function SantriIndex({ santris, status, success, error }: Props) 
                                         <TableHead>Nama</TableHead>
                                         <TableHead>NIS</TableHead>
                                         <TableHead>Asrama</TableHead>
-                                        <TableHead>Paket</TableHead>
+                                        <TableHead>Total Paket</TableHead>
                                         <TableHead className="text-right">Aksi</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     <Can permission="santri_view">
-                                        {santris.map((santri, index) => (
+                                        {filteredSantris.map((santri, index) => (
                                             <TableRow key={santri.id}>
                                                 <TableCell>{index + 1}</TableCell>
                                                 <TableCell>{santri.nama_santri}</TableCell>
                                                 <TableCell>{santri.nis}</TableCell>
                                                 <TableCell>{santri.asrama?.nama_asrama || '-'}</TableCell>
-                                                <TableCell>{santri.paket?.nama_paket || '-'}</TableCell>
+                                                <TableCell>{santri.total_paket_diterima || '-'}</TableCell>
                                                 <TableCell className="space-x-2 text-right">
                                                     <Can permission="santri_edit">
                                                         <Button variant="link" size="sm">

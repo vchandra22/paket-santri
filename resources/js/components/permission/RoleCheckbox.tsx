@@ -44,9 +44,6 @@ export default function RoleCheckbox({
     return (
         <div className="space-y-4">
             <div>
-                <div className="pb-3">
-                    <h4 className="text-md font-medium">Roles</h4>
-                </div>
                 <div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {roles.map((role) => (

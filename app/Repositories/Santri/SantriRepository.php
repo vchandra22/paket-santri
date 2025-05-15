@@ -14,7 +14,7 @@ class SantriRepository implements BaseRepositoryInterface
     }
     public function all()
     {
-        return $this->model->with('asrama', 'paket')->get();
+        return $this->model->with('asrama', 'paket')->latest()->get();
     }
 
     public function find($id)

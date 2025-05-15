@@ -15,7 +15,7 @@ class KategoriPaketRepository implements BaseRepositoryInterface
 
     public function all()
     {
-        return $this->model->all();
+        return $this->model->latest()->get();
     }
 
     public function find($id)

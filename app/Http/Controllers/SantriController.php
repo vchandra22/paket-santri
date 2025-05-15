@@ -93,4 +93,11 @@ class SantriController extends Controller
 
         return redirect()->route('santri.index')->with('success', 'Data santri berhasil dihapus');
     }
-}
+
+    /**
+     * Export to Excel
+     */
+    public function export()
+    {
+        return $this->santriService->exportToExcel('data-santri-' . date('Y-m-d'));
+    }}

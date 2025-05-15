@@ -21,15 +21,13 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast, Toaster } from 'sonner';
-import { Edit, Plus, Trash } from 'lucide-react';
+import { Pencil, Plus, Trash } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 interface Permission {
     id: number;
     name: string;
-    created_at: string;
-    updated_at: string;
 }
 
 interface User {
@@ -140,7 +138,6 @@ export default function Index({ auth, permissions }: IndexProps) {
                                     <TableRow>
                                         <TableHead>ID</TableHead>
                                         <TableHead>Name</TableHead>
-                                        <TableHead>Created At</TableHead>
                                         <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -149,26 +146,23 @@ export default function Index({ auth, permissions }: IndexProps) {
                                         <TableRow key={permission.id}>
                                             <TableCell>{permission.id}</TableCell>
                                             <TableCell>{permission.name}</TableCell>
-                                            <TableCell>
-                                                {new Date(permission.created_at).toLocaleDateString()}
-                                            </TableCell>
                                             <TableCell className="text-right space-x-2">
                                                 <Button
                                                     onClick={() => openEditDialog(permission)}
-                                                    variant="outline"
+                                                    variant="link"
                                                     size="sm"
-                                                    className="inline-flex items-center gap-1"
+                                                    className="cursor-pointer"
                                                 >
-                                                    <Edit className="h-4 w-4" />
+                                                    <Pencil className="mr-1 h-4 w-4" />
                                                     Edit
                                                 </Button>
                                                 <Button
                                                     onClick={() => openDeleteDialog(permission)}
-                                                    variant="destructive"
+                                                    variant="link"
                                                     size="sm"
-                                                    className="inline-flex items-center gap-1"
+                                                    className="text-red-500 cursor-pointer"
                                                 >
-                                                    <Trash className="h-4 w-4" />
+                                                    <Trash className="mr-1 h-4 w-4" />
                                                     Delete
                                                 </Button>
                                             </TableCell>
@@ -181,19 +175,16 @@ export default function Index({ auth, permissions }: IndexProps) {
                 </div>
             </div>
 
-            {/* Create Permission Dialog */}
+            {/* Buat Hak Akses Dialog */}
             <AlertDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Create New Permission</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Enter the name for the new permission.
-                        </AlertDialogDescription>
+                        <AlertDialogTitle>Buat Hak Akses Baru</AlertDialogTitle>
                     </AlertDialogHeader>
                     <form onSubmit={handleCreate}>
                         <div className="mb-4">
-                            <label htmlFor="name" className="block text-sm font-medium">
-                                Permission Name
+                            <label htmlFor="name" className="block text-sm font-medium mb-2">
+                                Nama Hak Akses
                             </label>
                             <Input
                                 id="name"
@@ -201,7 +192,7 @@ export default function Index({ auth, permissions }: IndexProps) {
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 className={errors.name ? 'border-red-500' : ''}
-                                placeholder="Enter permission name"
+                                placeholder="masukkan nama hak akses baru"
                             />
                             {errors.name && (
                                 <p className="mt-1 text-sm text-red-500">{errors.name}</p>
@@ -219,19 +210,16 @@ export default function Index({ auth, permissions }: IndexProps) {
                 </AlertDialogContent>
             </AlertDialog>
 
-            {/* Edit Permission Dialog */}
+            {/* Edit Hak Akses Dialog */}
             <AlertDialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Edit Permission</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Update the permission details.
-                        </AlertDialogDescription>
+                        <AlertDialogTitle>Edit Hak Akses</AlertDialogTitle>
                     </AlertDialogHeader>
                     <form onSubmit={handleUpdate}>
                         <div className="mb-4">
-                            <label htmlFor="edit-name" className="block text-sm font-medium">
-                                Permission Name
+                            <label htmlFor="edit-name" className="block text-sm font-medium mb-2">
+                                Nama Hak Akses
                             </label>
                             <Input
                                 id="edit-name"
@@ -239,7 +227,7 @@ export default function Index({ auth, permissions }: IndexProps) {
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 className={errors.name ? 'border-red-500' : ''}
-                                placeholder="Enter permission name"
+                                placeholder="masukkan nama hak akses baru"
                             />
                             {errors.name && (
                                 <p className="mt-1 text-sm text-red-500">{errors.name}</p>
@@ -257,13 +245,13 @@ export default function Index({ auth, permissions }: IndexProps) {
                 </AlertDialogContent>
             </AlertDialog>
 
-            {/* Delete Permission Dialog */}
+            {/* Delete Hak Akses Dialog */}
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Permission</AlertDialogTitle>
+                        <AlertDialogTitle>Delete Hak Akses</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete this permission? This action cannot be undone.
+                            Apakah anda yakin ingin menghapus hak akses ini? Tindakan ini tidak dapat dibatalkan.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

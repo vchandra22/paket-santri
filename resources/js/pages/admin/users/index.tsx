@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast, Toaster } from 'sonner';
-import { Edit, Plus, Trash } from 'lucide-react';
+import { Edit, Pencil, Plus, Search, Trash } from 'lucide-react';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import { Badge } from '@/components/ui/badge';
 import Can from '@/components/permission/Can';
@@ -59,6 +59,17 @@ export default function Index({ auth, users, roles }: IndexProps) {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [userToEdit, setUserToEdit] = useState<User | null>(null);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredUsers = useMemo(() => {
+        if (!searchTerm) return users;
+
+        const term = searchTerm.toLowerCase();
+        return users.filter(user =>
+            user.name.toLowerCase().includes(term) ||
+            user.email.toLowerCase().includes(term)
+        );
+    }, [users, searchTerm]);
 
     const { data, setData, post, put, processing, reset, errors } = useForm({
         name: '',
@@ -152,33 +163,43 @@ export default function Index({ auth, users, roles }: IndexProps) {
 
     return (
         <AppSidebarLayout breadcrumbs={breadcrumbs} user={auth.user}>
-            <Head title="User Management" />
+            <Head title="Data User" />
             <Toaster position="top-right" richColors />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">User Management</h1>
+                    <h1 className="text-2xl font-bold">Data User</h1>
                     <Can permission="user_create">
                         <Button onClick={openCreateDialog} className="flex items-center gap-2">
                             <Plus className="h-4 w-4" />
-                            Add User
+                            Tambahkan User Baru
                         </Button>
                     </Can>
                 </div>
 
-                <div className="bg-white rounded-lg shadow">
+                <div className="relative w-full max-w-md">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+                    <Input
+                        type="text"
+                        placeholder="Cari nama user ..."
+                        className="pl-10"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+
+                <div className="border border-slate-200 rounded-lg p-4 w-full">
                     <Table>
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Email</TableHead>
                                 <TableHead>Roles</TableHead>
-                                <TableHead>Created At</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {users.map((user) => (
+                            {filteredUsers.map((user) => (
                                 <TableRow key={user.id}>
                                     <TableCell>{user.name}</TableCell>
                                     <TableCell>{user.email}</TableCell>
@@ -191,28 +212,25 @@ export default function Index({ auth, users, roles }: IndexProps) {
                                             ))}
                                         </div>
                                     </TableCell>
-                                    <TableCell>
-                                        {new Date(user.created_at).toLocaleDateString()}
-                                    </TableCell>
                                     <TableCell className="text-right space-x-2">
                                         <Can permission="user_edit">
                                             <Button
                                                 onClick={() => openEditDialog(user)}
-                                                variant="outline"
+                                                variant="link"
                                                 size="sm"
-                                                className="inline-flex items-center gap-1"
+                                                className="cursor-pointer"
                                                 disabled={user.id === auth.user.id}
                                             >
-                                                <Edit className="h-4 w-4" />
+                                                <Pencil className="mr-1 h-4 w-4" />
                                                 Edit
                                             </Button>
                                         </Can>
                                         <Can permission="user_delete">
                                             <Button
                                                 onClick={() => openDeleteDialog(user)}
-                                                variant="destructive"
+                                                variant="link"
                                                 size="sm"
-                                                className="inline-flex items-center gap-1"
+                                                className="text-red-500"
                                                 disabled={user.id === auth.user.id}
                                             >
                                                 <Trash className="h-4 w-4" />
@@ -237,16 +255,13 @@ export default function Index({ auth, users, roles }: IndexProps) {
             <AlertDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                 <AlertDialogContent className="max-w-2xl">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Create New User</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Fill in the details to create a new user account.
-                        </AlertDialogDescription>
+                        <AlertDialogTitle>Buat User Baru</AlertDialogTitle>
                     </AlertDialogHeader>
                     <form onSubmit={handleCreate}>
                         <div className="space-y-4">
                             <div>
                                 <label htmlFor="name" className="block text-sm font-medium mb-1">
-                                    Name
+                                    Nama Lengkap
                                 </label>
                                 <Input
                                     id="name"
@@ -254,7 +269,7 @@ export default function Index({ auth, users, roles }: IndexProps) {
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
                                     className={errors.name ? 'border-red-500' : ''}
-                                    placeholder="Enter full name"
+                                    placeholder="Masukkan nama lengkap"
                                 />
                                 {errors.name && (
                                     <p className="mt-1 text-sm text-red-500">{errors.name}</p>
@@ -271,7 +286,7 @@ export default function Index({ auth, users, roles }: IndexProps) {
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
                                     className={errors.email ? 'border-red-500' : ''}
-                                    placeholder="Enter email address"
+                                    placeholder="Masukkan alamat email"
                                 />
                                 {errors.email && (
                                     <p className="mt-1 text-sm text-red-500">{errors.email}</p>
@@ -297,7 +312,7 @@ export default function Index({ auth, users, roles }: IndexProps) {
 
                             <div>
                                 <label htmlFor="password_confirmation" className="block text-sm font-medium mb-1">
-                                    Confirm Password
+                                    Konfirmasi Password
                                 </label>
                                 <Input
                                     id="password_confirmation"
@@ -305,7 +320,7 @@ export default function Index({ auth, users, roles }: IndexProps) {
                                     value={data.password_confirmation}
                                     onChange={(e) => setData('password_confirmation', e.target.value)}
                                     className={errors.password_confirmation ? 'border-red-500' : ''}
-                                    placeholder="Confirm password"
+                                    placeholder="Konfirmasi password"
                                 />
                                 {errors.password_confirmation && (
                                     <p className="mt-1 text-sm text-red-500">{errors.password_confirmation}</p>
@@ -316,7 +331,7 @@ export default function Index({ auth, users, roles }: IndexProps) {
                                 <label className="block text-sm font-medium mb-1">
                                     Roles
                                 </label>
-                                <div className="max-h-[200px] overflow-y-auto border rounded-md p-2">
+                                <div className="overflow-y-auto p-2">
                                     <RoleCheckbox
                                         roles={roles}
                                         selectedRoles={data.roles}
@@ -345,15 +360,12 @@ export default function Index({ auth, users, roles }: IndexProps) {
                 <AlertDialogContent className="max-w-2xl">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Edit User</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Update the user details and roles.
-                        </AlertDialogDescription>
                     </AlertDialogHeader>
                     <form onSubmit={handleUpdate}>
                         <div className="space-y-4">
                             <div>
                                 <label htmlFor="edit-name" className="block text-sm font-medium mb-1">
-                                    Name
+                                    Nama Lengkap
                                 </label>
                                 <Input
                                     id="edit-name"
@@ -361,7 +373,7 @@ export default function Index({ auth, users, roles }: IndexProps) {
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
                                     className={errors.name ? 'border-red-500' : ''}
-                                    placeholder="Enter full name"
+                                    placeholder="Masukkan nama lengkap"
                                 />
                                 {errors.name && (
                                     <p className="mt-1 text-sm text-red-500">{errors.name}</p>
@@ -378,7 +390,7 @@ export default function Index({ auth, users, roles }: IndexProps) {
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
                                     className={errors.email ? 'border-red-500' : ''}
-                                    placeholder="Enter email address"
+                                    placeholder="Masukkan alamat email"
                                 />
                                 {errors.email && (
                                     <p className="mt-1 text-sm text-red-500">{errors.email}</p>
@@ -387,7 +399,7 @@ export default function Index({ auth, users, roles }: IndexProps) {
 
                             <div>
                                 <label htmlFor="edit-password" className="block text-sm font-medium mb-1">
-                                    New Password (Kosongkan jika tidak ingin mengubah password)
+                                    Password Baru (Kosongkan jika tidak ingin mengubah password)
                                 </label>
                                 <Input
                                     id="edit-password"
@@ -404,7 +416,7 @@ export default function Index({ auth, users, roles }: IndexProps) {
 
                             <div>
                                 <label htmlFor="edit-password_confirmation" className="block text-sm font-medium mb-1">
-                                    Confirm New Password
+                                    Konfirmasi Password Baru
                                 </label>
                                 <Input
                                     id="edit-password_confirmation"
@@ -412,7 +424,7 @@ export default function Index({ auth, users, roles }: IndexProps) {
                                     value={data.password_confirmation}
                                     onChange={(e) => setData('password_confirmation', e.target.value)}
                                     className={errors.password_confirmation ? 'border-red-500' : ''}
-                                    placeholder="Confirm new password"
+                                    placeholder="Konfirmasi password baru"
                                 />
                                 {errors.password_confirmation && (
                                     <p className="mt-1 text-sm text-red-500">{errors.password_confirmation}</p>
@@ -423,7 +435,7 @@ export default function Index({ auth, users, roles }: IndexProps) {
                                 <label className="block text-sm font-medium mb-1">
                                     Roles
                                 </label>
-                                <div className="max-h-[200px] overflow-y-auto border rounded-md p-2">
+                                <div className="overflow-y-auto p-2">
                                     <RoleCheckbox
                                         roles={roles}
                                         selectedRoles={data.roles}

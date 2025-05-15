@@ -36,7 +36,7 @@ interface Permission {
 interface Role {
     id: number;
     name: string;
-    permissions: Permission[]; // Changed from 'permission' to 'permissions'
+    permissions: Permission[];
     created_at: string;
     updated_at: string;
 }
@@ -52,7 +52,7 @@ interface IndexProps {
         user: User;
     };
     roles: Role[];
-    permissions: Permission[]; // Changed from 'permission' to 'permissions'
+    permissions: Permission[];
 }
 
 export default function Index({ auth, roles, permissions }: IndexProps) {
@@ -171,12 +171,12 @@ export default function Index({ auth, roles, permissions }: IndexProps) {
                                             <TableCell>{role.name}</TableCell>
                                             <TableCell>
                                                 <div className="flex flex-wrap gap-1">
-                                                    {role.permissions.slice(0, 3).map((permission) => ( // Changed from 'permission' to 'permissions'
+                                                    {role.permissions.slice(0, 3).map((permission) => (
                                                         <Badge key={permission.id} variant="outline" className="mr-1">
                                                             {permission.name}
                                                         </Badge>
                                                     ))}
-                                                    {role.permissions.length > 3 && ( // Changed from 'permission' to 'permissions'
+                                                    {role.permissions.length > 3 && (
                                                         <Badge variant="outline">
                                                             +{role.permissions.length - 3} more
                                                         </Badge>
@@ -190,9 +190,9 @@ export default function Index({ auth, roles, permissions }: IndexProps) {
                                                 <Can permission="role_edit">
                                                     <Button
                                                         onClick={() => openEditDialog(role)}
-                                                        variant="outline"
+                                                        variant="link"
                                                         size="sm"
-                                                        className="inline-flex items-center gap-1"
+                                                        className="cursor-pointer"
                                                     >
                                                         <Edit className="h-4 w-4" />
                                                         Edit
@@ -201,9 +201,9 @@ export default function Index({ auth, roles, permissions }: IndexProps) {
                                                 <Can permission="role_delete">
                                                     <Button
                                                         onClick={() => openDeleteDialog(role)}
-                                                        variant="destructive"
+                                                        variant="link"
                                                         size="sm"
-                                                        className="inline-flex items-center gap-1"
+                                                        className="text-red-500 cursor-pointer"
                                                     >
                                                         <Trash className="h-4 w-4" />
                                                         Delete
@@ -221,17 +221,14 @@ export default function Index({ auth, roles, permissions }: IndexProps) {
 
             {/* Create Role Dialog */}
             <AlertDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                <AlertDialogContent className="max-w-2xl">
+                <AlertDialogContent className="max-h-[52rem] overflow-y-auto max-w-2xl">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Create New Role</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Enter the name for the new role and select permissions.
-                        </AlertDialogDescription>
+                        <AlertDialogTitle>Buat Role Baru</AlertDialogTitle>
                     </AlertDialogHeader>
                     <form onSubmit={handleCreate}>
                         <div className="mb-4">
                             <label htmlFor="name" className="block text-sm font-medium">
-                                Role Name
+                                Nama Role
                             </label>
                             <Input
                                 id="name"
@@ -239,7 +236,7 @@ export default function Index({ auth, roles, permissions }: IndexProps) {
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 className={errors.name ? 'border-red-500' : ''}
-                                placeholder="Enter role name"
+                                placeholder="Masukkan nama role baru"
                             />
                             {errors.name && (
                                 <p className="mt-1 text-sm text-red-500">{errors.name}</p>
@@ -248,11 +245,11 @@ export default function Index({ auth, roles, permissions }: IndexProps) {
 
                         <div className="mb-4">
                             <label className="block text-sm font-medium mb-2">
-                                Permissions
+                                Hak Akses
                             </label>
-                            <div className="max-h-[300px] overflow-y-auto">
+                            <div className="overflow-y-auto">
                                 <PermissionCheckbox
-                                    permissions={permissions} // Changed from 'permission' to 'permissions'
+                                    permissions={permissions}
                                     selectedPermissions={data.permissions}
                                     onChange={handlePermissionChange}
                                 />
@@ -276,17 +273,14 @@ export default function Index({ auth, roles, permissions }: IndexProps) {
 
             {/* Edit Role Dialog */}
             <AlertDialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                <AlertDialogContent className="max-w-2xl">
+                <AlertDialogContent className="max-h-[52rem] max-w-2xl overflow-y-auto">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Edit Role</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Update the role name and permissions.
-                        </AlertDialogDescription>
                     </AlertDialogHeader>
                     <form onSubmit={handleUpdate}>
                         <div className="mb-4">
                             <label htmlFor="edit-name" className="block text-sm font-medium">
-                                Role Name
+                                Nama Role
                             </label>
                             <Input
                                 id="edit-name"
@@ -294,7 +288,7 @@ export default function Index({ auth, roles, permissions }: IndexProps) {
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 className={errors.name ? 'border-red-500' : ''}
-                                placeholder="Enter role name"
+                                placeholder="Masukkan nama role baru"
                             />
                             {errors.name && (
                                 <p className="mt-1 text-sm text-red-500">{errors.name}</p>
@@ -303,11 +297,11 @@ export default function Index({ auth, roles, permissions }: IndexProps) {
 
                         <div className="mb-4">
                             <label className="block text-sm font-medium mb-2">
-                                Permissions
+                                Hak Akses
                             </label>
                             <div className="max-h-[300px] overflow-y-auto">
                                 <PermissionCheckbox
-                                    permissions={permissions} // Changed from 'permission' to 'permissions'
+                                    permissions={permissions}
                                     selectedPermissions={data.permissions}
                                     onChange={handlePermissionChange}
                                 />
@@ -335,7 +329,7 @@ export default function Index({ auth, roles, permissions }: IndexProps) {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete Role</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete the role "{roleToDelete?.name}"? This action cannot be undone.
+                            Apakah anda yakin ingin menghapus role ini? Tindakan ini tidak dapat dibatalkan.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
