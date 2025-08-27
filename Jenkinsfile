@@ -8,6 +8,13 @@ pipeline {
     }
 
     stages {
+        stage('Prepare Workspace') {
+            steps {
+                sh 'sudo chown -R $(id -u):$(id -g) .'
+                sh 'sudo chmod -R u+rw .'
+            }
+        }
+
         stage('Checkout') {
             steps {
                 checkout scm
