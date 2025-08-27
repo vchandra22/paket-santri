@@ -3,9 +3,8 @@ pipeline {
 
     environment {
         IMAGE_NAME = "vchandra22/paket-santri"
-        REGISTRY_URL = "https://index.docker.io/v1/"
-        REGISTRY_CREDENTIALS = "docker-hub-credentials"
         IMAGE_TAG = "v1.0.0"
+        REGISTRY_CREDENTIALS = "docker-hub-credentials"
     }
 
     stages {
@@ -17,41 +16,31 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    appImage = docker.build("${env.IMAGE_NAME}:${env.IMAGE_TAG}")
-                }
+                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
             }
         }
 
         stage('Install & Build') {
             steps {
-                script {
-                    appImage.inside {
-                        sh 'composer install --no-interaction --prefer-dist --optimize-autoloader'
-                        sh 'npm install --legacy-peer-deps'
-                        sh 'npm run build'
-                    }
-                }
+                sh "docker run --rm -v \$PWD:/app -w /app ${IMAGE_NAME}:${IMAGE_TAG} composer install --no-interaction --prefer-dist --optimize-autoloader"
+                sh "docker run --rm -v \$PWD:/app -w /app ${IMAGE_NAME}:${IMAGE_TAG} npm install --legacy-peer-deps"
+                sh "docker run --rm -v \$PWD:/app -w /app ${IMAGE_NAME}:${IMAGE_TAG} npm run build"
             }
         }
 
         stage('Run Tests') {
             steps {
-                script {
-                    appImage.inside {
-                        sh 'php artisan test'
-                    }
-                }
+                sh "docker run --rm -v \$PWD:/app -w /app ${IMAGE_NAME}:${IMAGE_TAG} php artisan test"
             }
         }
 
         stage('Push Image') {
             steps {
-                script {
-                    docker.withRegistry(env.REGISTRY_URL, env.REGISTRY_CREDENTIALS) {
-                        appImage.push(env.IMAGE_TAG)
-                        appImage.push("${env.BUILD_NUMBER}")
-                    }
+                withCredentials([usernamePassword(credentialsId: env.REGISTRY_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin"
+                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:${env.BUILD_NUMBER}"
+                    sh "docker push ${IMAGE_NAME}:${env.BUILD_NUMBER}"
                 }
             }
         }
@@ -59,9 +48,7 @@ pipeline {
 
     post {
         always {
-            script {
-                sh "docker system prune -af --volumes"
-            }
+            sh "docker system prune -af --volumes"
         }
     }
 }
