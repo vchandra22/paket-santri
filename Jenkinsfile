@@ -18,7 +18,6 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build image sekali, simpan reference ke variabel
                     appImage = docker.build("${env.IMAGE_NAME}:${env.IMAGE_TAG}")
                 }
             }
@@ -50,9 +49,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry(env.REGISTRY_URL, env.REGISTRY_CREDENTIALS) {
-                        // push tag branch (latest/staging)
                         appImage.push(env.IMAGE_TAG)
-                        // push tag unik berdasarkan build number
                         appImage.push("${env.BUILD_NUMBER}")
                     }
                 }
