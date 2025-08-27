@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "vchandra22/paket-santri"
-        IMAGE_TAG = "v1.0.0"
-        REGISTRY_CREDENTIALS = "docker-hub-credentials"
+        IMAGE_NAME = "vchandra22/paket-santri"        // ganti dengan Docker Hub repo kamu
+        IMAGE_TAG = "${env.BRANCH_NAME == 'main' ? 'latest' : 'staging'}"
+        REGISTRY_CREDENTIALS = "docker-hub-credentials" // ID credentials Jenkins
     }
 
     stages {
@@ -16,31 +16,58 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                script {
+                    appImage = docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                }
             }
         }
 
-        stage('Install & Build') {
+        stage('Install Dependencies & Build Assets') {
             steps {
-                sh "docker run --rm -v \$PWD:/app -w /app ${IMAGE_NAME}:${IMAGE_TAG} composer install --no-interaction --prefer-dist --optimize-autoloader"
-                sh "docker run --rm -v \$PWD:/app -w /app ${IMAGE_NAME}:${IMAGE_TAG} npm install --legacy-peer-deps"
-                sh "docker run --rm -v \$PWD:/app -w /app ${IMAGE_NAME}:${IMAGE_TAG} npm run build"
+                script {
+                    appImage.inside {
+                        sh 'composer install --no-interaction --prefer-dist --optimize-autoloader'
+                        sh 'npm install --legacy-peer-deps'
+                        sh 'npm run build'
+                    }
+                }
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Laravel Tests') {
             steps {
-                sh "docker run --rm -v \$PWD:/app -w /app ${IMAGE_NAME}:${IMAGE_TAG} php artisan test"
+                script {
+                    appImage.inside {
+                        sh 'php artisan test'
+                    }
+                }
             }
         }
 
-        stage('Push Image') {
+        stage('Push Docker Image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: env.REGISTRY_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin"
-                    sh "docker push ${IMAGE_NAME}:${IMAGE_TAG}"
-                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:${env.BUILD_NUMBER}"
-                    sh "docker push ${IMAGE_NAME}:${env.BUILD_NUMBER}"
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', REGISTRY_CREDENTIALS) {
+                        // Push berdasarkan branch (latest/staging)
+                        appImage.push(IMAGE_TAG)
+                        // Push juga dengan BUILD_NUMBER (untuk tracking/rollback)
+                        appImage.push("${env.BUILD_NUMBER}")
+                    }
+                }
+            }
+        }
+
+        // OPSIONAL: Deploy ke Kubernetes setelah push
+        stage('Deploy to Kubernetes') {
+            when {
+                branch 'main'
+            }
+            steps {
+                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    sh """
+                        kubectl --kubeconfig=$KUBECONFIG set image deployment/laravel-app \
+                            laravel-app=${IMAGE_NAME}:${IMAGE_TAG} -n laravel
+                    """
                 }
             }
         }
@@ -48,7 +75,9 @@ pipeline {
 
     post {
         always {
-            sh "docker system prune -af --volumes"
+            script {
+                sh "docker system prune -af --volumes"
+            }
         }
     }
 }
