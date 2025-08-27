@@ -2,16 +2,16 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "vchandra22/paket-santri"        // ganti dengan Docker Hub repo kamu
+        IMAGE_NAME = "vchandra22/paket-santri"
         IMAGE_TAG = "${env.BRANCH_NAME == 'main' ? 'latest' : 'staging'}"
-        REGISTRY_CREDENTIALS = "docker-hub-credentials" // ID credentials Jenkins
+        REGISTRY_CREDENTIALS = "docker-hub-credentials"
     }
 
     stages {
         stage('Prepare Workspace') {
             steps {
-                sh 'sudo chown -R $(id -u):$(id -g) .'
-                sh 'sudo chmod -R u+rw .'
+               sh 'chown -R $(id -u):$(id -g) . || true'
+               sh 'chmod -R u+rw .'
             }
         }
 
