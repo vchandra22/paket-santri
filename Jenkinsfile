@@ -5,7 +5,7 @@ pipeline {
         IMAGE_NAME = "vchandra22/paket-santri"
         REGISTRY_URL = "https://index.docker.io/v1/"
         REGISTRY_CREDENTIALS = "docker-hub-credentials"
-        IMAGE_TAG = "${env.BRANCH_NAME == 'main' ? 'latest' : 'staging'}"
+        IMAGE_TAG = "v1.0.0"
     }
 
     stages {
