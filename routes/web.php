@@ -80,6 +80,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::delete('/permissions/{permission}/destroy', [PermissionController::class, 'destroy'])->name('admin.permissions.destroy');
 });
 
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok'], 200);
+});
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
