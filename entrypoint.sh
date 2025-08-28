@@ -1,6 +1,5 @@
 #!/bin/bash
 echo "🔧 Menyetel permission direktori & permission Laravel..."
-
 mkdir -p /app/storage/framework/{cache/data,sessions,views,testing}
 mkdir -p /app/bootstrap/cache
 

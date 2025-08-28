@@ -2,7 +2,7 @@ FROM dunglas/frankenphp:latest-php8.2
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
-    curl unzip git libpq-dev libexif-dev libsodium-dev gnupg \
+    curl unzip git default-libmysqlclient-dev libexif-dev libsodium-dev gnupg \
     ca-certificates software-properties-common
 
 # Install Composer
@@ -10,7 +10,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # Install PHP extensions
 RUN install-php-extensions \
-    pgsql pdo_pgsql pdo_mysql \
+    pdo_mysql mysqli \
     gd intl zip exif sodium pcntl
 
 # Install Node.js (22.x LTS)
@@ -23,7 +23,7 @@ WORKDIR /app
 COPY . .
 
 # Install Laravel dependencies
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+RUN composer update --no-interaction --prefer-dist --optimize-autoloader
 
 # Install laravel octane
 RUN composer require laravel/octane --no-interaction --prefer-dist
