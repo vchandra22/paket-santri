@@ -1,26 +1,45 @@
 pipeline {
     agent any
+
     environment {
-        IMAGE_NAME = 'vchandra22/paket-santri'
-        IMAGE_TAG  = 'v1.0.0'
+        IMAGE_NAME = "vchandra22/paket-santri"
+        IMAGE_TAG = "v1.0.${BUILD_NUMBER}"
+        REGISTRY_CREDENTIALS = "docker-hub-credentials"
     }
+
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
+                checkout scm
             }
         }
-        stage('Push') {
+
+        stage('Build Docker Image') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'docker-hub-credentials',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_TOKEN'
-                )]) {
-                    sh 'echo $DOCKER_TOKEN | docker login -u $DOCKER_USER --password-stdin'
-                    sh 'docker push $IMAGE_NAME:$IMAGE_TAG'
+                script {
+                    docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
                 }
             }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', REGISTRY_CREDENTIALS) {
+                        docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push()
+                        docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push("latest")
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Image berhasil di-push ke Docker Hub: ${IMAGE_NAME}:${IMAGE_TAG}"
+        }
+        failure {
+            echo "❌ Build atau Push gagal!"
         }
     }
 }
