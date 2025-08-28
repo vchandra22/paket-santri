@@ -10,7 +10,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 # Install PHP extensions
 RUN install-php-extensions \
-    pgsql pdo_pgsql \
+    pgsql pdo_pgsql pdo_mysql \
     gd intl zip exif sodium pcntl
 
 # Install Node.js (22.x LTS)
