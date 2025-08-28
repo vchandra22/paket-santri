@@ -31,6 +31,9 @@ RUN composer require laravel/octane --no-interaction --prefer-dist
 # Install npm dependencies and build assets
 RUN npm install --legacy-peer-deps && npm run build
 
+# Prevent octane from downloading the binary, we'll do it in the entrypoint script
+ENV OCTANE_SKIP_BINARY_DOWNLOAD=1
+
 # Copy entrypoint for permission fix and octane start
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
