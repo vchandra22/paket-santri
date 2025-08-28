@@ -1,6 +1,14 @@
 pipeline {
     agent any
 
+    parameters {
+        booleanParam(
+            name: 'DOCKER_NO_CACHE',
+            defaultValue: false,
+            description: 'Build Docker image without cache (docker build --no-cache)'
+        )
+    }
+
     environment {
         IMAGE_NAME = "vchandra22/paket-santri"
         IMAGE_TAG = "v1.0.${BUILD_NUMBER}"
@@ -16,7 +24,10 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                script {
+                    def noCacheFlag = params.DOCKER_NO_CACHE ? '--no-cache' : ''
+                    sh "docker build ${noCacheFlag} -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                }
             }
         }
 
