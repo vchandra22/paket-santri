@@ -17,7 +17,6 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-
 COPY . .
 
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
@@ -32,6 +31,8 @@ RUN install-php-extensions \
 
 WORKDIR /app
 COPY --from=builder /app /app
+
+RUN ln -sf /usr/bin/frankenphp /usr/local/bin/frankenphp
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
