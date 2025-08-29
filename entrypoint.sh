@@ -12,5 +12,6 @@ exec php artisan octane:start \
     --server=frankenphp \
     --host=0.0.0.0 \
     --port=90 \
+    --admin-port=2019 \
     --workers=4 \
     --max-requests=500
