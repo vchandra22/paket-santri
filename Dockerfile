@@ -1,6 +1,6 @@
-FROM dunglas/frankenphp:latest-php8.2
+FROM dunglas/frankenphp:latest-php8.3 AS builder
 
-# Install dependencies
+# Install build dependencies
 RUN apt-get update && apt-get install -y \
     curl unzip git default-libmysqlclient-dev libexif-dev libsodium-dev gnupg \
     ca-certificates software-properties-common
@@ -19,24 +19,32 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
 
 WORKDIR /app
 
-# Copy entire project
+# Copy project files
 COPY . .
 
-# Install Laravel dependencies
-RUN composer update --no-interaction --prefer-dist --optimize-autoloader
-
-# Install laravel octane
-RUN composer require laravel/octane --no-interaction --prefer-dist
+# Install PHP dependencies (production only)
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
 # Install npm dependencies and build assets
 RUN npm install --legacy-peer-deps && npm run build
 
-# Prevent octane from downloading the binary, we'll do it in the entrypoint script
-ENV OCTANE_SKIP_BINARY_DOWNLOAD=1
+# --- Final stage ---
+FROM dunglas/frankenphp:latest-php8.3
 
-# Copy entrypoint for permission fix and octane start
+# Install runtime PHP extensions
+RUN install-php-extensions \
+    pdo_mysql mysqli \
+    gd intl zip exif sodium pcntl
+
+WORKDIR /app
+
+# Copy only necessary files from builder
+COPY --from=builder /app /app
+
+# Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Use entrypoint to handle permission & Octane startup
+ENV OCTANE_SKIP_BINARY_DOWNLOAD=1
+
 ENTRYPOINT ["/entrypoint.sh"]

@@ -2,17 +2,15 @@ pipeline {
     agent any
 
     parameters {
-        booleanParam(
-            name: 'DOCKER_NO_CACHE',
-            defaultValue: false,
-            description: 'Build Docker image without cache (docker build --no-cache)'
-        )
+        booleanParam(name: 'NO_CACHE', defaultValue: false, description: 'Build Docker image without cache')
     }
 
     environment {
-        IMAGE_NAME = "vchandra22/paket-santri"
-        IMAGE_TAG = "v1.0.${BUILD_NUMBER}"
-        REGISTRY_CREDENTIALS = "docker-hub-credentials"
+        REGISTRY = "88.222.245.252:5000"
+        IMAGE_NAME = "paket-santri"
+        STAGING_TAG = "staging-v${BUILD_NUMBER}"
+        PRODUCTION_TAG = "production-v${BUILD_NUMBER}"
+        REGISTRY_CREDENTIALS = "docker-private-registry"
     }
 
     stages {
@@ -22,35 +20,37 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build & Push Staging Image') {
             steps {
                 script {
-                    def noCacheFlag = params.DOCKER_NO_CACHE ? '--no-cache' : ''
-                    sh "docker build ${noCacheFlag} -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                    def cacheFlag = params.NO_CACHE ? "--no-cache" : ""
+                    sh "docker build ${cacheFlag} -t ${REGISTRY}/${IMAGE_NAME}:${STAGING_TAG} ."
                 }
-            }
-        }
-
-        stage('Push to Docker Hub') {
-            steps {
                 withCredentials([usernamePassword(credentialsId: "${REGISTRY_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
                     sh """
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker push ${IMAGE_NAME}:${IMAGE_TAG}
-                        docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
-                        docker push ${IMAGE_NAME}:latest
+                        echo "$DOCKER_PASS" | docker login ${REGISTRY} -u "$DOCKER_USER" --password-stdin
+                        docker push ${REGISTRY}/${IMAGE_NAME}:${STAGING_TAG}
                     """
                 }
             }
         }
-    }
 
-    post {
-        success {
-            echo "✅ Image berhasil di-push ke Docker Hub: ${IMAGE_NAME}:${IMAGE_TAG}"
-        }
-        failure {
-            echo "❌ Build atau Push gagal!"
+        stage('Promote to Production') {
+            steps {
+                script {
+                    input message: "Promote build ${BUILD_NUMBER} ke Production?"
+                    // checkout to branch main
+                    checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'git@github.com:vchandra22/paket-santri.git']]])
+                    def cacheFlag = params.NO_CACHE ? "--no-cache" : ""
+                    sh "docker build ${cacheFlag} -t ${REGISTRY}/${IMAGE_NAME}:${PRODUCTION_TAG} ."
+                    withCredentials([usernamePassword(credentialsId: "${REGISTRY_CREDENTIALS}", usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASS")]) {
+                        sh """
+                            echo "$DOCKER_PASS" | docker login ${REGISTRY} -u "$DOCKER_USER" --password-stdin
+                            docker push ${REGISTRY}/${IMAGE_NAME}:${PRODUCTION_TAG}
+                        """
+                    }
+                }
+            }
         }
     }
 }
