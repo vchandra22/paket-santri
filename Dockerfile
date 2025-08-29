@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:latest-php8.3 AS builder
+FROM dunglas/frankenphp:1.2.1-php8.3 AS builder
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
@@ -29,7 +29,7 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-d
 RUN npm install --legacy-peer-deps && npm run build
 
 # --- Final stage ---
-FROM dunglas/frankenphp:latest-php8.3
+FROM dunglas/frankenphp:1.2.1-php8.3
 
 # Install runtime PHP extensions
 RUN install-php-extensions \
