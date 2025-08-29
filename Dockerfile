@@ -36,6 +36,9 @@ RUN install-php-extensions \
     pdo_mysql mysqli \
     gd intl zip exif sodium pcntl
 
+# fix path FrankenPHP
+RUN ln -s /usr/bin/frankenphp /usr/local/bin/frankenphp || true
+
 WORKDIR /app
 
 # Copy only necessary files from builder
