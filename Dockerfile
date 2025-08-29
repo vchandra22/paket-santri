@@ -32,22 +32,22 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-d
 RUN npm install --legacy-peer-deps && npm run build
 
 # --- Final stage ---
-FROM dunglas/frankenphp:php8.3
+FROM dunglas/frankenphp:1.2.1
 
 # Install runtime PHP extensions (lebih ringan dari builder)
 RUN install-php-extensions \
     pdo_mysql mysqli \
     gd intl zip exif sodium pcntl
 
-# Install FrankenPHP binary manual (hindari prompt Octane)
-RUN curl -L https://github.com/dunglas/frankenphp/releases/download/v1.2.1/frankenphp-linux-x86_64 \
-    -o /usr/local/bin/frankenphp \
-    && chmod +x /usr/local/bin/frankenphp
-
 WORKDIR /app
 
 # Copy only necessary files from builder
 COPY --from=builder /app /app
+
+# Install FrankenPHP binary manual (hindari prompt Octane)
+RUN curl -L https://github.com/dunglas/frankenphp/releases/download/v1.2.1/frankenphp-linux-x86_64 \
+    -o /usr/local/bin/frankenphp \
+    && chmod +x /usr/local/bin/frankenphp
 
 # Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
