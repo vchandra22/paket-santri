@@ -4,13 +4,13 @@ set -e
 echo "🔧 Set permission Laravel..."
 mkdir -p /app/storage/framework/{cache/data,sessions,views,testing}
 mkdir -p /app/bootstrap/cache
-chown -R www-data:www-data /app/storage /app/bootstrap/cache
-chmod -R ug+rwX /app/storage /app/bootstrap/cache
+chown -R www-data:www-data /app/storage /app/bootstrap/cache /app/storage/framework
+chmod -R ug+rwX /app/storage /app/bootstrap/cache /app/storage/framework
 
-echo "⚡ Optimize Laravel cache..."
-php artisan config:cache || true
-php artisan route:cache || true
-php artisan view:cache || true
-
-echo "🚀 Start FrankenPHP directly..."
-exec frankenphp run --workers=4 --max-requests=500 public/index.php
+echo "🚀 Menjalankan Laravel Octane dengan FrankenPHP..."
+exec php artisan octane:start \
+    --server=frankenphp \
+    --host=0.0.0.0 \
+    --port=90 \
+    --workers=4 \
+    --max-requests=500
