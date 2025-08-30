@@ -38,7 +38,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     return (
         <AuthLayout title="Masuk" description="Masuk dengan menggunakan alamat email dan password yang telah Anda daftarkan.">
             <Head title="Masuk" />
-
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">
@@ -103,6 +102,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     </TextLink>
                 </div>
             </form>
+            <p className="text-gray-400 text-center text-xs mt-4">v1.0.37 (staging)</p>
 
             {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
         </AuthLayout>
