@@ -102,7 +102,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     </TextLink>
                 </div>
             </form>
-            <p className="text-gray-400 text-center text-xs mt-4">v1.0.41 (staging)</p>
+            <p className="text-gray-400 text-center text-xs mt-4">v1.0.42 (staging)</p>
 
             {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
         </AuthLayout>
