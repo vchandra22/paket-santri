@@ -9,8 +9,9 @@ pipeline {
     environment {
         REGISTRY = "88.222.245.252:5000"
         IMAGE_NAME = "paket-santri"
-        STAGING_TAG = "staging-v${BUILD_NUMBER}"
-        PRODUCTION_TAG = "production-v${BUILD_NUMBER}"
+        VERSION = readFile('VERSION').trim()
+        STAGING_TAG = "staging-v${VERSION}"
+        PRODUCTION_TAG = "production-v${VERSION}"
         REGISTRY_CREDENTIALS = "docker-private-registry"
     }
 
